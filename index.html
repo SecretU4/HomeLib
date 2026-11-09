@@ -1313,19 +1313,18 @@ function fillBookForm(
   );
 
 
-  document
-    .getElementById(
-      'bookCard'
-    )
-    .scrollIntoView({
+  // 도서 정보 입력 영역 표시
+  const bookCard = document.getElementById('bookCard');
 
-      behavior:
-        'smooth',
+  bookCard.classList.remove('hidden');
 
-      block:
-        'start'
-
+  // 화면에 표시된 후 해당 위치로 이동
+  requestAnimationFrame(() => {
+    bookCard.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     });
+  });
 
 }
 
