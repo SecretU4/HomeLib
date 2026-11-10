@@ -772,77 +772,39 @@ function setStatus(
  ************************************************************/
 
 
+
 const API_URL =
   'https://script.google.com/macros/s/AKfycbzU6PsnOJXkXXioLltuRfCW8IalCPCWD2kr3h91Tj0Q0Yy-mBVM51MSH4OH18v7FMmp/exec';
 
-
-
-async function apiRequest(
-  action,
-  data = {}
-) {
-
-  if (
-    !API_URL ||
-    API_URL.indexOf(
-      '여기에_'
-    ) === 0
-  ) {
-
-    throw new Error(
-      'index.html의 API_URL을 설정해주세요.'
-    );
-
+async function apiRequest(action, data = {}) {
+  if (!API_URL || !API_URL.includes('/exec')) {
+    throw new Error('GAS API 주소를 확인해주세요.');
   }
 
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action,
+      ...data
+    })
+  });
 
-  const response =
-    await fetch(
-      API_URL,
-      {
-
-        method: 'POST',
-
-        headers: {
-
-          'Content-Type':
-            'text/plain;charset=utf-8'
-
-        },
-
-        body:
-          JSON.stringify({
-
-            action:
-              action,
-
-            ...data
-
-          })
-
-      }
-    );
-
-
-  const result =
-    await response.json();
-
-
-  if (
-    !result.success
-  ) {
-
-    throw new Error(
-      result.error ||
-      '서버 오류'
-    );
-
+  if (!response.ok) {
+    throw new Error('서버 HTTP 오류: ' + response.status);
   }
 
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || '서버 요청에 실패했습니다.');
+  }
 
   return result.data;
-
 }
+
 
 
 
@@ -1522,11 +1484,13 @@ async function saveBook() {
         )
         .src || '',
 
-
-    series:
-      document.getElementById(
-        'series'
-      ).value.trim(),
+    
+    coverExists:
+      document.getElementById('coverExists').value,
+        series:
+          document.getElementById(
+            'series'
+          ).value.trim(),
 
 
     volume:
