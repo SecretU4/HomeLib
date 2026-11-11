@@ -1,14 +1,27 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-  <meta charset="UTF-8">
+
+  <base target="_top">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+    content="width=device-width,
+             initial-scale=1,
+             maximum-scale=1,
+             user-scalable=no">
 
-  <title>내 서재 관리</title>
+  <title>내 서재 스캐너</title>
+
+
+  <!--
+    ISBN / EAN 바코드 스캐너
+  -->
+  <script
+  src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"
+  type="text/javascript">
+  </script>
+
 
   <style>
 
@@ -16,722 +29,592 @@
       box-sizing: border-box;
     }
 
+
     body {
+
       margin: 0;
-      padding: 0;
+
+      padding: 16px;
+
+      background: #f5f6f7;
+
+      color: #222;
+
       font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Noto Sans KR",
-        "Malgun Gothic",
         sans-serif;
-      background: #f5f6f8;
-      color: #222;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-    }
 
     h1 {
-      margin: 0 0 20px;
-      font-size: 26px;
+
+      font-size: 22px;
+
+      margin:
+        4px 0 16px;
     }
+
 
     h2 {
-      margin-top: 0;
-      font-size: 20px;
+
+      font-size: 17px;
+
+      margin:
+        22px 0 10px;
     }
+
 
     .card {
-      background: #fff;
+
+      background: white;
+
       border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 18px;
+
+      padding: 16px;
+
+      margin-bottom: 14px;
+
       box-shadow:
-        0 2px 10px rgba(0, 0, 0, 0.06);
+        0 2px 8px
+        rgba(0,0,0,.06);
     }
 
-    .scan-area {
-      text-align: center;
-    }
 
     #reader {
+
       width: 100%;
+
       max-width: 500px;
-      margin: 15px auto;
-      overflow: hidden;
-      border-radius: 12px;
-      background: #111;
+
+      margin: auto;
     }
 
-    #video {
-      width: 100%;
-      display: none;
-      border-radius: 12px;
-      background: #000;
-    }
-
-    .scan-message {
-      padding: 12px;
-      color: #666;
-      font-size: 14px;
-    }
 
     button {
-      border: 0;
-      border-radius: 9px;
-      padding: 11px 16px;
-      font-size: 15px;
-      cursor: pointer;
-      background: #2563eb;
-      color: white;
-      margin: 4px;
-    }
 
-    button:hover {
-      opacity: 0.9;
-    }
-
-    button.secondary {
-      background: #64748b;
-    }
-
-    button.success {
-      background: #16a34a;
-    }
-
-    button.danger {
-      background: #dc2626;
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .isbn-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-
-    .isbn-row input {
-      flex: 1;
-    }
-
-    label {
-      display: block;
-      margin-top: 12px;
-      margin-bottom: 5px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    input,
-    textarea,
-    select {
       width: 100%;
-      padding: 11px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 15px;
-      background: white;
-    }
 
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
+      min-height: 48px;
 
-    .grid {
-      display: grid;
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
+      border: 0;
 
-    .full {
-      grid-column: 1 / -1;
-    }
-
-    .cover {
-      width: 150px;
-      max-height: 220px;
-      object-fit: contain;
-      border-radius: 8px;
-      display: block;
-      margin: 10px auto;
-      background: #eee;
-    }
-
-    .status {
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      background: #f1f5f9;
-      color: #334155;
-      white-space: pre-wrap;
-    }
-
-    .status.success {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .status.error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .status.warning {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .duplicate {
-      border: 1px solid #f59e0b;
-      background: #fffbeb;
       border-radius: 10px;
-      padding: 12px;
+
+      background: #1a73e8;
+
+      color: white;
+
+      font-size: 16px;
+
+      font-weight: 600;
+
       margin-top: 10px;
     }
 
-    .duplicate-title {
-      font-weight: bold;
+
+    button.secondary {
+
+      background: #5f6368;
     }
 
-    .small {
-      font-size: 13px;
-      color: #64748b;
+
+    button.success {
+
+      background: #188038;
     }
 
-    .actions {
-      text-align: center;
-      margin-top: 18px;
+
+    button.danger {
+
+      background: #d93025;
     }
+
+
+    input,
+    select,
+    textarea {
+
+      width: 100%;
+
+      min-height: 44px;
+
+      border:
+        1px solid #dadce0;
+
+      border-radius: 8px;
+
+      padding: 9px 10px;
+
+      font-size: 16px;
+
+      background: white;
+    }
+
+
+    textarea {
+
+      min-height: 90px;
+
+      resize: vertical;
+    }
+
+
+    label {
+
+      display: block;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      margin:
+        12px 0 6px;
+    }
+
+
+    .book-title {
+
+      font-size: 19px;
+
+      font-weight: 700;
+
+      line-height: 1.4;
+    }
+
+
+    .book-meta {
+
+      color: #666;
+
+      margin-top: 5px;
+
+      line-height: 1.5;
+    }
+
+
+    .cover {
+
+      width: 90px;
+
+      max-height: 130px;
+
+      object-fit: contain;
+
+      float: right;
+
+      margin-left: 12px;
+
+      border-radius: 4px;
+    }
+
+
+    .clear {
+
+      clear: both;
+    }
+
+
+    .status {
+
+      padding: 10px;
+
+      border-radius: 8px;
+
+      background: #eef3f8;
+
+      margin-bottom: 12px;
+
+      font-size: 14px;
+    }
+
+
+    .status.error {
+
+      background: #fce8e6;
+
+      color: #c5221f;
+    }
+
+
+    .status.success {
+
+      background: #e6f4ea;
+
+      color: #137333;
+    }
+
 
     .hidden {
+
       display: none !important;
     }
 
-    .cover-row {
-      text-align: center;
-      margin-bottom: 15px;
+
+    .duplicate {
+
+      background: #fff8e1;
+
+      border-left:
+        4px solid #f9ab00;
+
+      padding: 10px;
+
+      margin-top: 10px;
+
+      border-radius: 5px;
+
+      font-size: 14px;
     }
 
-    @media (max-width: 650px) {
 
-      .container {
-        padding: 12px;
-      }
+    .recent-item {
 
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      padding: 10px 0;
 
-      .isbn-row {
-        flex-direction: column;
-      }
+      border-bottom:
+        1px solid #eee;
+    }
 
-      button {
-        width: 100%;
-        margin: 4px 0;
-      }
 
+    .recent-item:last-child {
+
+      border-bottom: 0;
+    }
+
+
+    .recent-title {
+
+      font-weight: 600;
+    }
+
+
+    .small {
+
+      color: #777;
+
+      font-size: 13px;
+    }
+
+
+    .row {
+
+      display: flex;
+
+      gap: 8px;
+    }
+
+
+    .row > * {
+
+      flex: 1;
     }
 
   </style>
 
 </head>
 
+
 <body>
 
-<div class="container">
 
-  <h1>📚 내 서재 관리</h1>
+<h1>📚 내 서재 스캐너</h1>
 
 
-  <!-- =====================================================
-       상태
-       ===================================================== -->
+<div
+  id="status"
+  class="status">
 
-  <div
-    id="status"
-    class="status"
-  >
-    ISBN을 스캔하거나 직접 입력해주세요.
-  </div>
+  카메라를 시작하고
+  책의 ISBN 바코드를
+  비춰주세요.
 
+</div>
 
-  <!-- =====================================================
-       ISBN 입력
-       ===================================================== -->
 
-  <div class="card">
+<div class="card">
 
-    <h2>ISBN</h2>
+  <div id="reader"></div>
 
-    <div class="isbn-row">
 
-      <input
-        id="isbn"
-        type="text"
-        inputmode="numeric"
-        placeholder="ISBN을 입력하세요"
-      >
+  <button
+    id="startButton"
+    onclick="startScanner()">
 
-      <button
-        onclick="lookupISBN()"
-      >
-        도서 검색
-      </button>
+    📷 ISBN 스캔 시작
 
-    </div>
+  </button>
 
-    <div class="actions">
 
-      <button
-        onclick="startScanner()"
-      >
-        📷 바코드 스캔
-      </button>
+  <button
+    id="stopButton"
+    class="secondary hidden"
+    onclick="stopScanner()">
 
-      <button
-        class="secondary"
-        onclick="stopScanner()"
-      >
-        스캔 종료
-      </button>
+    카메라 끄기
 
-    </div>
+  </button>
 
-  </div>
+</div>
 
 
-  <!-- =====================================================
-       바코드 스캐너
-       ===================================================== -->
+<div
+  id="manualCard"
+  class="card">
 
-  <div
-    id="scannerCard"
-    class="card hidden"
-  >
+  <h2>직접 ISBN 입력</h2>
 
-    <h2>📷 바코드 스캔</h2>
 
-    <div
-      id="reader"
-    >
+  <input
+    id="manualISBN"
+    type="text"
+    inputmode="numeric"
+    placeholder="ISBN-10 또는 ISBN-13">
 
-      <video
-        id="video"
-        autoplay
-        playsinline
-        muted
-      ></video>
 
-    </div>
+  <button
+    onclick="manualLookup()">
 
-    <div
-      id="scannerMessage"
-      class="scan-message"
-    >
-      카메라를 준비하는 중입니다.
-    </div>
+    ISBN 조회
 
-  </div>
+  </button>
 
+</div>
 
-  <!-- =====================================================
-       중복 도서
-       ===================================================== -->
 
-  <div
-    id="duplicateCard"
-    class="card hidden"
-  >
+<div
+  id="bookCard"
+  class="card hidden">
 
-    <h2>⚠️ 이미 등록된 책</h2>
 
-    <div id="duplicateList"></div>
+  <div id="bookInfo"></div>
 
-  </div>
 
+  <div id="duplicateInfo"></div>
 
-  <!-- =====================================================
-       도서 정보
-       ===================================================== -->
 
-  <div
-    id="bookCard"
-    class="card hidden"
-  >
+  <h2>소장 정보</h2>
 
-    <h2>도서 정보</h2>
 
+  <label>부록</label>
 
-    <div class="cover-row">
+  <select id="supplement">
 
-      <img
-        id="cover"
-        class="cover hidden"
-        alt="표지"
-      >
+    <option value="확인 필요">
+      확인 필요
+    </option>
 
-    </div>
+    <option value="있음">
+      있음
+    </option>
 
+    <option value="없음">
+      없음
+    </option>
 
-    <div class="grid">
+  </select>
 
-      <!-- ISBN -->
 
-      <div>
+  <label>부록 상세</label>
 
-        <label>ISBN</label>
+  <input
+    id="supplementDetail"
+    placeholder="예: 엽서 3장, CD, 포스터">
 
-        <input
-          id="bookISBN"
-          type="text"
-        >
 
-      </div>
+  <label>띠지</label>
 
+  <select id="obi">
 
-      <!-- 제목 -->
+    <option value="확인 필요">
+      확인 필요
+    </option>
 
-      <div>
+    <option value="있음">
+      있음
+    </option>
 
-        <label>제목</label>
+    <option value="없음">
+      없음
+    </option>
 
-        <input
-          id="title"
-          type="text"
-        >
+  </select>
 
-      </div>
 
+  <label>초판</label>
 
-      <!-- 저자 -->
+  <select id="firstEdition">
 
-      <div>
+    <option value="확인 필요">
+      확인 필요
+    </option>
 
-        <label>저자</label>
+    <option value="예">
+      예
+    </option>
 
-        <input
-          id="author"
-          type="text"
-        >
+    <option value="아니오">
+      아니오
+    </option>
 
-      </div>
+  </select>
 
 
-      <!-- 출판사 -->
+  <label>책 상태</label>
 
-      <div>
+  <select id="condition">
 
-        <label>출판사</label>
+    <option value="확인 필요">
+      확인 필요
+    </option>
 
-        <input
-          id="publisher"
-          type="text"
-        >
+    <option value="미개봉">
+      미개봉
+    </option>
 
-      </div>
+    <option value="최상">
+      최상
+    </option>
 
+    <option value="상">
+      상
+    </option>
 
-      <!-- 출간일 -->
+    <option value="중">
+      중
+    </option>
 
-      <div>
+    <option value="하">
+      하
+    </option>
 
-        <label>출간일</label>
+    <option value="훼손">
+      훼손
+    </option>
 
-        <input
-          id="publishedDate"
-          type="date"
-        >
+  </select>
 
-      </div>
 
+  <label>보관 위치</label>
 
-      <!-- 시리즈명 -->
+  <input
+    id="location"
+    placeholder="예: 서재A-3단-12">
 
-      <div>
 
-        <label>시리즈명</label>
+  <label>구매일</label>
 
-        <input
-          id="series"
-          type="text"
-          placeholder="예: 원피스"
-        >
+  <input
+    id="purchaseDate"
+    type="date">
 
-      </div>
 
+  <label>구매 가격</label>
 
-      <!-- 권차 -->
+  <input
+    id="purchasePrice"
+    type="number"
+    inputmode="numeric"
+    placeholder="원">
 
-      <div>
 
-        <label>권차</label>
+  <label>메모</label>
 
-        <input
-          id="volume"
-          type="text"
-          placeholder="예: 5"
-        >
+  <textarea
+    id="note"
+    placeholder="특이사항"></textarea>
 
-      </div>
 
+  <button
+    class="success"
+    onclick="saveBook()">
 
-      <!-- 부록 -->
+    💾 서재에 저장
 
-      <div>
+  </button>
 
-        <label>부록</label>
 
-        <input
-          id="supplement"
-          type="text"
-          placeholder="예: 엽서, 책갈피"
-        >
+  <button
+    class="secondary"
+    onclick="resetBook()">
 
-      </div>
+    다음 책 스캔
 
+  </button>
 
-      <!-- 부록상세 -->
 
-      <div>
+</div>
 
-        <label>부록상세</label>
 
-        <input
-          id="supplementDetail"
-          type="text"
-        >
+<div class="card">
 
-      </div>
+  <h2>최근 등록</h2>
 
-
-      <!-- 표지유무 -->
-
-      <div>
-
-        <label>표지유무</label>
-
-        <select id="coverExists">
-
-          <option value="있음">
-            있음
-          </option>
-
-          <option value="없음">
-            없음
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- 띠지 -->
-
-      <div>
-
-        <label>띠지</label>
-
-        <select id="obi">
-
-          <option value="">
-            선택
-          </option>
-
-          <option value="있음">
-            있음
-          </option>
-
-          <option value="없음">
-            없음
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- 초판 -->
-
-      <div>
-
-        <label>초판</label>
-
-        <select id="firstEdition">
-
-          <option value="">
-            선택
-          </option>
-
-          <option value="예">
-            예
-          </option>
-
-          <option value="아니오">
-            아니오
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- 상태 -->
-
-      <div>
-
-        <label>상태</label>
-
-        <select id="condition">
-
-          <option value="">
-            선택
-          </option>
-
-          <option value="미개봉">
-            미개봉
-          </option>
-
-          <option value="개봉">
-            개봉
-          </option>
-
-          <option value="중고">
-            중고
-          </option>
-
-          <option value="상태확인필요">
-            상태 확인 필요
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- 보관위치 -->
-
-      <div>
-
-        <label>보관위치</label>
-
-        <input
-          id="location"
-          type="text"
-          placeholder="예: 책장 A-3"
-        >
-
-      </div>
-
-
-      <!-- 구매일 -->
-
-      <div>
-
-        <label>구매일</label>
-
-        <input
-          id="purchaseDate"
-          type="date"
-        >
-
-      </div>
-
-
-      <!-- 구매가격 -->
-
-      <div>
-
-        <label>구매가격</label>
-
-        <input
-          id="purchasePrice"
-          type="number"
-          min="0"
-          step="1"
-        >
-
-      </div>
-
-
-      <!-- 메모 -->
-
-      <div class="full">
-
-        <label>메모</label>
-
-        <textarea
-          id="note"
-          placeholder="메모를 입력하세요"
-        ></textarea>
-
-      </div>
-
-    </div>
-
-
-    <div class="actions">
-
-      <button
-        class="success"
-        onclick="saveBook()"
-      >
-        💾 서재에 저장
-      </button>
-
-      <button
-        class="secondary"
-        onclick="clearForm()"
-      >
-        초기화
-      </button>
-
-    </div>
-
+  <div id="recent">
+    불러오는 중...
   </div>
 
 </div>
 
 
 
-<!-- =======================================================
-     ZXing
-     ======================================================= -->
-
-<script src="https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js"></script>
-
-
 <script>
 
-/************************************************************
- * 1. 전역 변수
- ************************************************************/
+// 배포한 Google Apps Script 웹 앱의 /exec 주소를 입력하세요.
+// 예: https://script.google.com/macros/s/배포ID/exec
+const GAS_API_URL = 'YOUR_GAS_WEB_APP_URL';
+
+/** GitHub Pages에서 GAS doPost API 호출 */
+async function apiRequest(action, payload = {}) {
+  if (!GAS_API_URL || GAS_API_URL === 'YOUR_GAS_WEB_APP_URL') {
+    throw new Error('GAS_API_URL에 Google Apps Script 웹 앱 URL을 설정해주세요.');
+  }
+
+  let response;
+  try {
+    response = await fetch(GAS_API_URL, {
+      method: 'POST',
+      // text/plain 요청은 JSON Content-Type의 CORS preflight를 피하기 위한 설정입니다.
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, ...payload }),
+      redirect: 'follow'
+    });
+  } catch (error) {
+    throw new Error('GAS 서버에 연결하지 못했습니다. 배포 URL과 웹 앱 액세스 권한을 확인해주세요. (' + error.message + ')');
+  }
+
+  if (!response.ok) {
+    throw new Error('서버 응답 오류: HTTP ' + response.status);
+  }
+
+  let result;
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error('서버 응답을 JSON으로 읽지 못했습니다. GAS 배포 및 접근 권한을 확인해주세요.');
+  }
+
+  if (!result.success) {
+    throw new Error(result.error || '요청 처리 중 오류가 발생했습니다.');
+  }
+  return result.data;
+}
+
+let scanner = null;
+
+let currentBook = null;
+
+let scanning = false;
+
+let lastScan = '';
+
+let lastScanTime = 0;
 
 
-let scannerStream = null;
-
-let barcodeDetector = null;
-
-let scannerRunning = false;
-
-let scanAnimationFrame = null;
-
-
-/************************************************************
- * 2. 상태 표시
- ************************************************************/
-
-
+/**
+ * 상태 메시지
+ */
 function setStatus(
   message,
   type = ''
@@ -743,1601 +626,681 @@ function setStatus(
     );
 
 
-  el.textContent =
-    message;
+  el.textContent = message;
 
-
-  el.className =
-    'status';
+  el.className = 'status';
 
 
   if (type) {
 
-    el.classList.add(
-      type
-    );
-
+    el.classList.add(type);
   }
-
 }
 
 
+/**
+ * 스캐너 시작
+ */
+function startScanner() {
 
-/************************************************************
- * 3. API 요청
- *
- * Google Apps Script 웹 앱 URL
- *
- * 반드시 배포 후 생성된 URL로 변경하세요.
- ************************************************************/
-
-
-
-const API_URL =
-  'https://script.google.com/macros/s/AKfycbzU6PsnOJXkXXioLltuRfCW8IalCPCWD2kr3h91Tj0Q0Yy-mBVM51MSH4OH18v7FMmp/exec';
-
-async function apiRequest(action, data = {}) {
-  if (!API_URL || !API_URL.includes('/exec')) {
-    throw new Error('GAS API 주소를 확인해주세요.');
+  if (scanning) {
+    return;
   }
 
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify({
-      action,
-      ...data
+  setStatus(
+    '📷 카메라 권한을 요청하는 중입니다...'
+  );
+
+  // 먼저 브라우저의 카메라 권한을 직접 요청합니다.
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setStatus('이 브라우저에서는 카메라를 사용할 수 없습니다. HTTPS로 접속해주세요.', 'error');
+    return;
+  }
+
+  navigator.mediaDevices
+    .getUserMedia({
+      video: {
+        facingMode: {
+          ideal: 'environment'
+        }
+      },
+      audio: false
     })
-  });
 
-  if (!response.ok) {
-    throw new Error('서버 HTTP 오류: ' + response.status);
-  }
+    .then(function(stream) {
 
-  const result = await response.json();
+      // 권한 확인 후 즉시 스트림 종료
+      stream.getTracks().forEach(
+        function(track) {
+          track.stop();
+        }
+      );
 
-  if (!result.success) {
-    throw new Error(result.error || '서버 요청에 실패했습니다.');
-  }
+      setStatus(
+        '📷 카메라 권한 확인 완료. 스캐너를 시작합니다...'
+      );
 
-  return result.data;
+      scanner =
+        new Html5Qrcode('reader');
+
+      const config = {
+
+        fps: 10,
+
+        qrbox: function(
+          viewfinderWidth,
+          viewfinderHeight
+        ) {
+
+          const width =
+            Math.floor(
+              viewfinderWidth * 0.85
+            );
+
+          const height =
+            Math.floor(
+              viewfinderHeight * 0.30
+            );
+
+          return {
+            width: width,
+            height: height
+          };
+        },
+
+        formatsToSupport: [
+
+          Html5QrcodeSupportedFormats.EAN_13,
+
+          Html5QrcodeSupportedFormats.EAN_8
+
+        ],
+
+        rememberLastUsedCamera: true
+
+      };
+
+
+      scanner.start(
+
+        {
+          facingMode: 'environment'
+        },
+
+        config,
+
+        onScanSuccess,
+
+        onScanError
+
+      )
+
+      .then(function() {
+
+        scanning = true;
+
+        document
+          .getElementById('startButton')
+          .classList
+          .add('hidden');
+
+        document
+          .getElementById('stopButton')
+          .classList
+          .remove('hidden');
+
+        setStatus(
+          '📷 카메라가 켜졌습니다. 책의 ISBN 바코드를 비춰주세요.',
+          'success'
+        );
+
+      })
+
+      .catch(function(error) {
+
+        console.error(
+          'Html5Qrcode start error:',
+          error
+        );
+
+        setStatus(
+
+          '카메라를 시작하지 못했습니다: ' +
+          getCameraErrorMessage(error),
+
+          'error'
+        );
+
+      });
+
+    })
+
+    .catch(function(error) {
+
+      console.error(
+        'getUserMedia error:',
+        error
+      );
+
+      setStatus(
+
+        '카메라 접근이 거부되었습니다: ' +
+        getCameraErrorMessage(error),
+
+        'error'
+      );
+
+    });
 }
 
 
+/**
+ * 스캔 성공
+ */
+function onScanSuccess(
+  decodedText
+) {
+
+  const now =
+    Date.now();
 
 
-/************************************************************
- * 4. ISBN 검색
- ************************************************************/
+  // 같은 바코드 반복 인식 방지
+  if (
+
+    decodedText === lastScan &&
+
+    now - lastScanTime < 3000
+
+  ) {
+
+    return;
+  }
 
 
-async function lookupISBN() {
+  lastScan =
+    decodedText;
 
-  const input =
-    document.getElementById(
-      'isbn'
+  lastScanTime =
+    now;
+
+
+  let isbn =
+    decodedText
+      .replace(
+        /[^0-9Xx]/g,
+        ''
+      )
+      .toUpperCase();
+
+
+  if (
+
+    isbn.length !== 13 &&
+
+    isbn.length !== 10
+
+  ) {
+
+    setStatus(
+
+      'ISBN 형식으로 보이지 않습니다: ' +
+      isbn,
+
+      'error'
     );
 
+    return;
+  }
+
+
+  stopScanner();
+
+
+  lookup(isbn);
+}
+
+
+/**
+ * 스캔 오류는 무시합니다.
+ */
+function onScanError(
+  errorMessage
+) {
+
+  // 카메라가 계속 프레임을
+  // 읽기 때문에 오류 메시지는 표시하지 않습니다.
+}
+
+
+/**
+ * 스캐너 중지
+ */
+function stopScanner() {
+
+  if (
+    !scanner ||
+    !scanning
+  ) {
+
+    return;
+  }
+
+
+  scanner
+    .stop()
+
+    .then(() => {
+
+      scanning = false;
+
+
+      document
+        .getElementById(
+          'startButton'
+        )
+        .classList
+        .remove('hidden');
+
+
+      document
+        .getElementById(
+          'stopButton'
+        )
+        .classList
+        .add('hidden');
+
+    })
+
+    .catch(err => {
+
+      console.error(err);
+
+    });
+}
+
+
+/**
+ * 직접 ISBN 조회
+ */
+function manualLookup() {
 
   const isbn =
-    input.value.trim();
+    document
+      .getElementById(
+        'manualISBN'
+      )
+      .value
+      .trim();
 
 
   if (!isbn) {
 
     setStatus(
       'ISBN을 입력해주세요.',
-      'warning'
-    );
-
-    return;
-
-  }
-
-
-  stopScanner();
-
-
-  try {
-
-    setStatus(
-      'ISBN으로 도서 정보를 검색하는 중입니다...'
-    );
-
-
-    const duplicate =
-      await apiRequest(
-        'duplicate',
-        {
-          isbn: isbn
-        }
-      );
-
-
-    showDuplicates(
-      duplicate
-    );
-
-
-    const book =
-      await apiRequest(
-        'lookup',
-        {
-          isbn: isbn
-        }
-      );
-
-
-    if (
-      !book ||
-      !book.found
-    ) {
-
-      setStatus(
-
-        '도서 정보를 찾지 못했습니다.\n' +
-        'ISBN은 입력되어 있으므로 직접 정보를 입력한 뒤 저장할 수 있습니다.',
-
-        'warning'
-
-      );
-
-
-      showBookForm({
-
-        isbn:
-          normalizeISBN(
-            isbn
-          ),
-
-        title: '',
-
-        authors: '',
-
-        publisher: '',
-
-        publishedDate: '',
-
-        thumbnail: '',
-
-        series: '',
-
-        volume: '',
-
-        source:
-          'ISBN 검색 실패'
-
-      });
-
-
-      return;
-
-    }
-
-
-    fillBookForm(
-      book
-    );
-
-
-    if (
-      duplicate &&
-      duplicate.length > 0
-    ) {
-
-      setStatus(
-
-        '도서 정보를 찾았습니다.\n' +
-        '다만 동일 ISBN의 책이 이미 등록되어 있습니다.',
-
-        'warning'
-
-      );
-
-    } else {
-
-      setStatus(
-        '도서 정보를 찾았습니다.',
-        'success'
-      );
-
-    }
-
-
-  } catch (error) {
-
-    console.error(
-      error
-    );
-
-
-    setStatus(
-
-      '도서 검색 중 오류가 발생했습니다.\n' +
-      error.message,
-
       'error'
-
-    );
-
-  }
-
-}
-
-
-
-/************************************************************
- * 5. ISBN 정규화
- ************************************************************/
-
-
-function normalizeISBN(
-  isbn
-) {
-
-  return String(
-    isbn || ''
-  )
-    .replace(
-      /[^0-9Xx]/g,
-      ''
-    )
-    .toUpperCase();
-
-}
-
-
-
-/************************************************************
- * 6. 중복 표시
- ************************************************************/
-
-
-function showDuplicates(
-  duplicates
-) {
-
-  const card =
-    document.getElementById(
-      'duplicateCard'
-    );
-
-
-  const list =
-    document.getElementById(
-      'duplicateList'
-    );
-
-
-  list.innerHTML =
-    '';
-
-
-  if (
-    !duplicates ||
-    duplicates.length === 0
-  ) {
-
-    card.classList.add(
-      'hidden'
     );
 
     return;
-
   }
 
 
-  card.classList.remove(
-    'hidden'
-  );
-
-
-  duplicates.forEach(
-    book => {
-
-      const div =
-        document.createElement(
-          'div'
-        );
-
-
-      div.className =
-        'duplicate';
-
-
-      div.innerHTML = `
-
-        <div class="duplicate-title">
-          ${escapeHTML(
-            book.title || '(제목 없음)'
-          )}
-        </div>
-
-        <div class="small">
-          소장ID:
-          ${escapeHTML(
-            book.id || ''
-          )}
-        </div>
-
-        <div class="small">
-          ISBN:
-          ${escapeHTML(
-            book.isbn || ''
-          )}
-        </div>
-
-        <div class="small">
-          출판사:
-          ${escapeHTML(
-            book.publisher || ''
-          )}
-        </div>
-
-        <div class="small">
-          시리즈:
-          ${escapeHTML(
-            book.series || ''
-          )}
-        </div>
-
-        <div class="small">
-          권차:
-          ${escapeHTML(
-            book.volume || ''
-          )}
-        </div>
-
-      `;
-
-
-      list.appendChild(
-        div
-      );
-
-    }
-  );
-
+  lookup(isbn);
 }
 
 
-
-/************************************************************
- * 7. 도서 폼 표시
- ************************************************************/
-
-
-function showBookForm(
-  book
-) {
-
-  document
-    .getElementById(
-      'bookCard'
-    )
-    .classList.remove(
-      'hidden'
-    );
-
-
-  fillBookForm(
-    book
-  );
-
-}
-
-
-
-/************************************************************
- * 8. 도서 정보 폼 채우기
- ************************************************************/
-
-
-function fillBookForm(
-  book
-) {
-
-  document.getElementById(
-    'bookISBN'
-  ).value =
-    book.isbn ||
-    '';
-
-
-  document.getElementById(
-    'isbn'
-  ).value =
-    book.isbn ||
-    '';
-
-
-  document.getElementById(
-    'title'
-  ).value =
-    book.title ||
-    '';
-
-
-  document.getElementById(
-    'author'
-  ).value =
-    book.authors ||
-    book.author ||
-    '';
-
-
-  document.getElementById(
-    'publisher'
-  ).value =
-    book.publisher ||
-    '';
-
-
-  document.getElementById(
-    'publishedDate'
-  ).value =
-    normalizeDateInput(
-      book.publishedDate
-    );
-
-
-  document.getElementById(
-    'series'
-  ).value =
-    book.series ||
-    '';
-
-
-  document.getElementById(
-    'volume'
-  ).value =
-    book.volume ||
-    '';
-
-
-  document.getElementById(
-    'supplement'
-  ).value =
-    book.supplement ||
-    '';
-
-
-  document.getElementById(
-    'supplementDetail'
-  ).value =
-    book.supplementDetail ||
-    '';
-
-
-  document.getElementById(
-    'coverExists'
-  ).value =
-    book.thumbnail
-      ? '있음'
-      : '없음';
-
-
-  document.getElementById(
-    'obi'
-  ).value =
-    book.obi ||
-    '';
-
-
-  document.getElementById(
-    'firstEdition'
-  ).value =
-    book.firstEdition ||
-    '';
-
-
-  document.getElementById(
-    'condition'
-  ).value =
-    book.condition ||
-    '';
-
-
-  document.getElementById(
-    'location'
-  ).value =
-    book.location ||
-    '';
-
-
-  document.getElementById(
-    'purchaseDate'
-  ).value =
-    normalizeDateInput(
-      book.purchaseDate
-    );
-
-
-  document.getElementById(
-    'purchasePrice'
-  ).value =
-    book.purchasePrice ||
-    '';
-
-
-  document.getElementById(
-    'note'
-  ).value =
-    book.note ||
-    '';
-
-
-  setCover(
-    book.thumbnail ||
-    ''
-  );
-
-
-  // 도서 정보 입력 영역 표시
-  const bookCard = document.getElementById('bookCard');
-
-  bookCard.classList.remove('hidden');
-
-  // 화면에 표시된 후 해당 위치로 이동
-  requestAnimationFrame(() => {
-    bookCard.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
+/**
+ * ISBN 조회
+ */
+function lookup(isbn) {
+  setStatus('📚 도서정보를 조회하는 중입니다...');
+  apiRequest('lookup', { isbn })
+    .then(function(book) {
+      if (!book.found) {
+        setStatus('도서정보를 찾지 못했습니다. ISBN을 확인해주세요.', 'error');
+        return;
+      }
+      currentBook = book;
+      showBook(book);
+      checkDuplicate(book.isbn);
+      setStatus('도서정보를 찾았습니다. 소장 정보를 입력해주세요.', 'success');
+    })
+    .catch(function(error) {
+      console.error(error);
+      setStatus('조회 오류: ' + error.message, 'error');
     });
-  });
-
 }
 
 
-
-/************************************************************
- * 9. 날짜 입력 형식
- ************************************************************/
-
-
-function normalizeDateInput(
-  value
-) {
-
-  if (!value) {
-
-    return '';
-
-  }
-
-
-  const text =
-    String(
-      value
-    );
-
-
-  /*
-   * 이미 yyyy-MM-dd라면 그대로 사용
-   */
-
-  if (
-    /^\d{4}-\d{2}-\d{2}$/.test(
-      text
-    )
-  ) {
-
-    return text;
-
-  }
-
-
-  /*
-   * yyyy-MM-ddTHH:mm:ss...
-   */
-
-  const match =
-    text.match(
-      /^(\d{4}-\d{2}-\d{2})/
-    );
-
-
-  if (
-    match
-  ) {
-
-    return match[1];
-
-  }
-
-
-  const date =
-    new Date(
-      value
-    );
-
-
-  if (
-    isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return '';
-
-  }
-
-
-  return (
-    date.getFullYear() +
-    '-' +
-    String(
-      date.getMonth() + 1
-    ).padStart(
-      2,
-      '0'
-    ) +
-    '-' +
-    String(
-      date.getDate()
-    ).padStart(
-      2,
-      '0'
-    )
-  );
-
-}
-
-
-
-/************************************************************
- * 10. 표지 표시
- ************************************************************/
-
-
-function setCover(
-  url
-) {
+/**
+ * 책 정보 표시
+ */
+function showBook(book) {
 
   const cover =
-    document.getElementById(
-      'cover'
-    );
+    book.thumbnail
+
+      ? `
+        <img
+          class="cover"
+          src="${escapeHtml(
+            book.thumbnail
+          )}">
+      `
+
+      : '';
 
 
-  if (!url) {
+  document
+    .getElementById(
+      'bookInfo'
+    )
+    .innerHTML = `
 
-    cover.src =
-      '';
+      ${cover}
 
-    cover.classList.add(
-      'hidden'
-    );
+      <div
+        class="book-title">
 
-    return;
+        ${escapeHtml(
+          book.title ||
+          '제목 없음'
+        )}
 
-  }
-
-
-  cover.src =
-    url;
-
-
-  cover.classList.remove(
-    'hidden'
-  );
+      </div>
 
 
-  cover.onerror =
-    function() {
+      <div
+        class="book-meta">
 
-      cover.classList.add(
-        'hidden'
-      );
+        ${escapeHtml(
+          book.authors ||
+          '저자 정보 없음'
+        )}
 
-    };
+      </div>
 
+
+      <div
+        class="book-meta">
+
+        ${escapeHtml(
+          book.publisher ||
+          ''
+        )}
+
+        ${
+          book.publishedDate
+
+            ? ' · ' +
+              escapeHtml(
+                book.publishedDate
+              )
+
+            : ''
+        }
+
+
+        ${
+          book.pageCount
+
+            ? ' · ' +
+              escapeHtml(
+                String(
+                  book.pageCount
+                )
+              ) +
+              '쪽'
+
+            : ''
+        }
+
+      </div>
+
+
+      <div
+        class="book-meta">
+
+        ISBN:
+        ${escapeHtml(
+          book.isbn
+        )}
+
+      </div>
+
+
+      <div
+        class="clear">
+      </div>
+    `;
+
+
+  document.getElementById('duplicateInfo').innerHTML = '';
+
+  document
+    .getElementById(
+      'bookCard'
+    )
+    .classList
+    .remove('hidden');
 }
 
 
+/**
+ * 중복 확인
+ */
+function checkDuplicate(isbn) {
+  apiRequest('duplicate', { isbn })
+    .then(function(items) {
+      const el = document.getElementById('duplicateInfo');
+      if (!items || items.length === 0) {
+        el.innerHTML = '';
+        return;
+      }
 
-/************************************************************
- * 11. 책 저장
- ************************************************************/
+      let html = '<div class="duplicate">⚠️ 이 ISBN의 책을 이미 ' + items.length + '권 가지고 있습니다.';
+      items.forEach(function(item) {
+        html += '<br>· ' + escapeHtml(item.id);
+        if (item.location) html += ' / ' + escapeHtml(item.location);
+        if (item.condition) html += ' / ' + escapeHtml(item.condition);
+      });
+      html += '<br><br>같은 책을 추가로 소장하는 경우에는 그대로 저장하면 됩니다.</div>';
+      el.innerHTML = html;
+    })
+    .catch(function(error) {
+      console.error(error);
+      document.getElementById('duplicateInfo').textContent = '중복 확인 실패: ' + error.message;
+    });
+}
 
 
-async function saveBook() {
+/**
+ * 책 저장
+ */
+function saveBook() {
+  if (!currentBook) {
+    setStatus('먼저 책을 조회해주세요.', 'error');
+    return;
+  }
 
   const book = {
-
-    isbn:
-      document.getElementById(
-        'bookISBN'
-      ).value.trim(),
-
-
-    title:
-      document.getElementById(
-        'title'
-      ).value.trim(),
-
-
-    authors:
-      document.getElementById(
-        'author'
-      ).value.trim(),
-
-
-    publisher:
-      document.getElementById(
-        'publisher'
-      ).value.trim(),
-
-
-    publishedDate:
-      document.getElementById(
-        'publishedDate'
-      ).value,
-
-
-    thumbnail:
-      document
-        .getElementById(
-          'cover'
-        )
-        .src || '',
-
-    
-    coverExists:
-      document.getElementById('coverExists').value,
-        series:
-          document.getElementById(
-            'series'
-          ).value.trim(),
-
-
-    volume:
-      document.getElementById(
-        'volume'
-      ).value.trim(),
-
-
-    supplement:
-      document.getElementById(
-        'supplement'
-      ).value.trim(),
-
-
-    supplementDetail:
-      document.getElementById(
-        'supplementDetail'
-      ).value.trim(),
-
-
-    obi:
-      document.getElementById(
-        'obi'
-      ).value,
-
-
-    firstEdition:
-      document.getElementById(
-        'firstEdition'
-      ).value,
-
-
-    condition:
-      document.getElementById(
-        'condition'
-      ).value,
-
-
-    location:
-      document.getElementById(
-        'location'
-      ).value.trim(),
-
-
-    purchaseDate:
-      document.getElementById(
-        'purchaseDate'
-      ).value,
-
-
-    purchasePrice:
-      document.getElementById(
-        'purchasePrice'
-      ).value,
-
-
-    note:
-      document.getElementById(
-        'note'
-      ).value.trim(),
-
-
-    source:
-      '카카오 / 사용자 입력'
-
+    isbn: currentBook.isbn,
+    title: currentBook.title,
+    authors: currentBook.authors,
+    publisher: currentBook.publisher,
+    publishedDate: currentBook.publishedDate,
+    pageCount: currentBook.pageCount,
+    thumbnail: currentBook.thumbnail,
+    source: currentBook.source,
+    supplement: document.getElementById('supplement').value,
+    supplementDetail: document.getElementById('supplementDetail').value,
+    obi: document.getElementById('obi').value,
+    firstEdition: document.getElementById('firstEdition').value,
+    condition: document.getElementById('condition').value,
+    location: document.getElementById('location').value,
+    purchaseDate: document.getElementById('purchaseDate').value,
+    purchasePrice: document.getElementById('purchasePrice').value,
+    note: document.getElementById('note').value
   };
 
-
-  if (
-    !book.title
-  ) {
-
-    setStatus(
-      '제목을 입력해주세요.',
-      'warning'
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    setStatus(
-      '서재에 저장하는 중입니다...'
-    );
-
-
-    const result =
-      await apiRequest(
-        'save',
-        {
-          book:
-            book
-        }
-      );
-
-
-    setStatus(
-
-      '저장되었습니다.\n' +
-      '소장ID: ' +
-      result.collectionId,
-
-      'success'
-
-    );
-
-
-    /*
-     * 저장 후 중복 목록 갱신
-     */
-
-    if (
-      book.isbn
-    ) {
-
-      const duplicates =
-        await apiRequest(
-          'duplicate',
-          {
-            isbn:
-              book.isbn
-          }
-        );
-
-
-      showDuplicates(
-        duplicates
-      );
-
-    }
-
-
-  } catch (error) {
-
-    console.error(
-      error
-    );
-
-
-    setStatus(
-
-      '저장 중 오류가 발생했습니다.\n' +
-      error.message,
-
-      'error'
-
-    );
-
-  }
-
+  setStatus('저장하는 중입니다...');
+  apiRequest('save', { book })
+    .then(function(result) {
+      setStatus('✅ 저장 완료: ' + result.collectionId, 'success');
+      resetBook();
+      loadRecent();
+    })
+    .catch(function(error) {
+      console.error(error);
+      setStatus('저장 오류: ' + error.message, 'error');
+    });
 }
 
 
+/**
+ * 다음 책 준비
+ */
+function resetBook() {
 
-/************************************************************
- * 12. 폼 초기화
- ************************************************************/
-
-
-function clearForm() {
-
-  const ids = [
-
-    'bookISBN',
-
-    'title',
-
-    'author',
-
-    'publisher',
-
-    'publishedDate',
-
-    'series',
-
-    'volume',
-
-    'supplement',
-
-    'supplementDetail',
-
-    'location',
-
-    'purchaseDate',
-
-    'purchasePrice',
-
-    'note'
-
-  ];
-
-
-  ids.forEach(
-    id => {
-
-      document.getElementById(
-        id
-      ).value =
-        '';
-
-    }
-  );
-
-
-  document.getElementById(
-    'obi'
-  ).value =
-    '';
-
-
-  document.getElementById(
-    'firstEdition'
-  ).value =
-    '';
-
-
-  document.getElementById(
-    'condition'
-  ).value =
-    '';
-
-
-  document.getElementById(
-    'coverExists'
-  ).value =
-    '있음';
-
-
-  setCover(
-    ''
-  );
+  currentBook =
+    null;
 
 
   document
     .getElementById(
       'bookCard'
     )
-    .classList.add(
-      'hidden'
-    );
+    .classList
+    .add('hidden');
 
 
   document
     .getElementById(
-      'duplicateCard'
+      'manualISBN'
     )
-    .classList.add(
-      'hidden'
-    );
+    .value = '';
+
+
+  document
+    .getElementById(
+      'supplement'
+    )
+    .value =
+      '확인 필요';
+
+
+  document
+    .getElementById(
+      'supplementDetail'
+    )
+    .value = '';
+
+
+  document
+    .getElementById(
+      'obi'
+    )
+    .value =
+      '확인 필요';
+
+
+  document
+    .getElementById(
+      'firstEdition'
+    )
+    .value =
+      '확인 필요';
+
+
+  document
+    .getElementById(
+      'condition'
+    )
+    .value =
+      '확인 필요';
+
+
+  document
+    .getElementById(
+      'location'
+    )
+    .value = '';
+
+
+  document
+    .getElementById(
+      'purchaseDate'
+    )
+    .value = '';
+
+
+  document
+    .getElementById(
+      'purchasePrice'
+    )
+    .value = '';
+
+
+  document
+    .getElementById(
+      'note'
+    )
+    .value = '';
 
 
   setStatus(
-    'ISBN을 스캔하거나 직접 입력해주세요.'
+    '다음 책의 ISBN을 스캔해주세요.'
   );
-
 }
 
 
+/**
+ * 최근 등록 목록
+ */
+function loadRecent() {
+  const el = document.getElementById('recent');
+  el.textContent = '불러오는 중...';
 
-/************************************************************
- * 13. 카메라 시작
- ************************************************************/
-
-
-async function startScanner() {
-
-  if (
-    scannerRunning
-  ) {
-
-    return;
-
-  }
-
-
-  const scannerCard =
-    document.getElementById(
-      'scannerCard'
-    );
-
-
-  const video =
-    document.getElementById(
-      'video'
-    );
-
-
-  const message =
-    document.getElementById(
-      'scannerMessage'
-    );
-
-
-  scannerCard.classList.remove(
-    'hidden'
-  );
-
-
-  message.textContent =
-    '카메라 권한을 요청하는 중입니다...';
-
-
-  /*
-   * HTTPS 또는 localhost 여부 확인
-   */
-
-  if (
-    location.protocol !== 'https:' &&
-    location.hostname !== 'localhost' &&
-    location.hostname !== '127.0.0.1'
-  ) {
-
-    message.textContent =
-      '카메라 사용에는 HTTPS가 필요합니다. ' +
-      'Google Apps Script 웹 앱 주소 또는 HTTPS 주소에서 실행해주세요.';
-
-  }
-
-
-  try {
-
-    if (
-      !navigator.mediaDevices ||
-      !navigator.mediaDevices.getUserMedia
-    ) {
-
-      throw new Error(
-        '이 브라우저에서는 카메라 기능을 사용할 수 없습니다.'
-      );
-
-    }
-
-
-    scannerStream =
-      await navigator
-        .mediaDevices
-        .getUserMedia({
-
-          video: {
-
-            facingMode: {
-              ideal: 'environment'
-            },
-
-            width: {
-              ideal: 1280
-            },
-
-            height: {
-              ideal: 720
-            }
-
-          },
-
-          audio: false
-
-        });
-
-
-    video.srcObject =
-      scannerStream;
-
-
-    video.style.display =
-      'block';
-
-
-    await video.play();
-
-
-    scannerRunning =
-      true;
-
-
-    message.textContent =
-      '책 뒷면의 ISBN 바코드를 카메라에 보여주세요.';
-
-
-    /*
-     * BarcodeDetector 우선
-     */
-
-    if (
-      'BarcodeDetector'
-      in window
-    ) {
-
-      try {
-
-        barcodeDetector =
-          new BarcodeDetector({
-
-            formats: [
-
-              'ean_13',
-
-              'ean_8'
-
-            ]
-
-          });
-
-
-        scanWithBarcodeDetector();
-
+  apiRequest('recent')
+    .then(function(items) {
+      if (!items || items.length === 0) {
+        el.innerHTML = '<div class="small">아직 등록된 책이 없습니다.</div>';
         return;
-
-      } catch (error) {
-
-        console.warn(
-          'BarcodeDetector 초기화 실패:',
-          error
-        );
-
       }
-
-    }
-
-
-    /*
-     * ZXing fallback
-     */
-
-    startZXingScanner();
-
-  } catch (error) {
-
-    console.error(
-      error
-    );
-
-
-    stopScanner();
-
-
-    message.textContent =
-      '카메라를 시작할 수 없습니다.';
-
-
-    setStatus(
-
-      '카메라를 사용할 수 없습니다.\n' +
-      error.message +
-      '\n\n' +
-      '브라우저의 카메라 권한이 허용되어 있는지 확인해주세요.',
-
-      'error'
-
-    );
-
-  }
-
+      el.innerHTML = items.map(function(item) {
+        return '<div class="recent-item">' +
+          '<div class="recent-title">' + escapeHtml(item.title || '(제목 없음)') + '</div>' +
+          '<div class="small">' + escapeHtml(item.author || '') + '</div>' +
+          '<div class="small">' + escapeHtml(item.id || '') + ' · ' +
+          escapeHtml(item.supplement || '') + ' · ' + escapeHtml(item.condition || '') +
+          (item.location ? ' · ' + escapeHtml(item.location) : '') + '</div>' +
+          '</div>';
+      }).join('');
+    })
+    .catch(function(error) {
+      console.error(error);
+      el.textContent = '최근 목록을 불러오지 못했습니다: ' + error.message;
+    });
 }
 
 
-
-/************************************************************
- * 14. BarcodeDetector 방식
- ************************************************************/
-
-
-async function scanWithBarcodeDetector() {
-
-  if (
-    !scannerRunning ||
-    !barcodeDetector
-  ) {
-
-    return;
-
-  }
-
-
-  const video =
-    document.getElementById(
-      'video'
-    );
-
-
-  try {
-
-    const barcodes =
-      await barcodeDetector.detect(
-        video
-      );
-
-
-    if (
-      barcodes &&
-      barcodes.length > 0
-    ) {
-
-      const value =
-        barcodes[0].rawValue;
-
-
-      if (
-        value
-      ) {
-
-        onBarcodeDetected(
-          value
-        );
-
-
-        return;
-
-      }
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      '바코드 감지 오류:',
-      error
-    );
-
-  }
-
-
-  scanAnimationFrame =
-    requestAnimationFrame(
-      scanWithBarcodeDetector
-    );
-
-}
-
-
-
-/************************************************************
- * 15. ZXing fallback
- ************************************************************/
-
-
-async function startZXingScanner() {
-
-  if (
-    typeof ZXingBrowser ===
-    'undefined'
-  ) {
-
-    throw new Error(
-      '바코드 스캔 라이브러리를 불러오지 못했습니다.'
-    );
-
-  }
-
-
-  const video =
-    document.getElementById(
-      'video'
-    );
-
-
-  const codeReader =
-    new ZXingBrowser.BrowserMultiFormatReader();
-
-
-  window.currentCodeReader =
-    codeReader;
-
-
-  try {
-
-    const devices =
-      await ZXingBrowser.BrowserCodeReader
-        .listVideoInputDevices();
-
-
-    if (
-      !devices ||
-      devices.length === 0
-    ) {
-
-      throw new Error(
-        '사용 가능한 카메라가 없습니다.'
-      );
-
-    }
-
-
-    let selectedDevice =
-      devices[0];
-
-
-    /*
-     * 후면 카메라 우선
-     */
-
-    for (
-      const device
-      of devices
-    ) {
-
-      const label =
-        (
-          device.label ||
-          ''
-        ).toLowerCase();
-
-
-      if (
-        label.includes(
-          'back'
-        ) ||
-        label.includes(
-          'rear'
-        ) ||
-        label.includes(
-          'environment'
-        )
-      ) {
-
-        selectedDevice =
-          device;
-
-        break;
-
-      }
-
-    }
-
-
-    codeReader.decodeFromVideoDevice(
-
-      selectedDevice.deviceId,
-
-      video,
-
-      (
-        result,
-        error
-      ) => {
-
-        if (
-          result
-        ) {
-
-          const text =
-            result.getText();
-
-
-          onBarcodeDetected(
-            text
-          );
-
-        }
-
-      }
-
-    );
-
-  } catch (error) {
-
-    console.error(
-      error
-    );
-
-
-    throw error;
-
-  }
-
-}
-
-
-
-/************************************************************
- * 16. 바코드 감지
- ************************************************************/
-
-
-function onBarcodeDetected(
+/**
+ * HTML escape
+ */
+function escapeHtml(
   value
 ) {
 
   if (
-    !scannerRunning
+    value === null ||
+    value === undefined
   ) {
 
-    return;
-
+    return '';
   }
 
 
-  const isbn =
-    normalizeISBN(
-      value
-    );
-
-
-  /*
-   * ISBN13 또는 ISBN10만 허용
-   */
-
-  if (
-    isbn.length !== 13 &&
-    isbn.length !== 10
-  ) {
-
-    return;
-
-  }
-
-
-  stopScanner();
-
-
-  document.getElementById(
-    'isbn'
-  ).value =
-    isbn;
-
-
-  setStatus(
-    'ISBN 바코드를 인식했습니다.\n도서 정보를 검색합니다...'
-  );
-
-
-  lookupISBN();
-
-}
-
-
-
-/************************************************************
- * 17. 카메라 종료
- ************************************************************/
-
-
-function stopScanner() {
-
-  scannerRunning =
-    false;
-
-
-  if (
-    scanAnimationFrame
-  ) {
-
-    cancelAnimationFrame(
-      scanAnimationFrame
-    );
-
-    scanAnimationFrame =
-      null;
-
-  }
-
-
-  if (
-    window.currentCodeReader
-  ) {
-
-    try {
-
-      window.currentCodeReader.reset();
-
-    } catch (error) {
-
-      console.warn(
-        error
-      );
-
-    }
-
-
-    window.currentCodeReader =
-      null;
-
-  }
-
-
-  if (
-    scannerStream
-  ) {
-
-    scannerStream
-      .getTracks()
-      .forEach(
-        track => {
-
-          track.stop();
-
-        }
-      );
-
-
-    scannerStream =
-      null;
-
-  }
-
-
-  const video =
-    document.getElementById(
-      'video'
-    );
-
-
-  if (video) {
-
-    video.pause();
-
-    video.srcObject =
-      null;
-
-    video.style.display =
-      'none';
-
-  }
-
-
-  const scannerCard =
-    document.getElementById(
-      'scannerCard'
-    );
-
-
-  if (scannerCard) {
-
-    scannerCard.classList.add(
-      'hidden'
-    );
-
-  }
-
-}
-
-
-
-/************************************************************
- * 18. HTML escape
- ************************************************************/
-
-
-function escapeHTML(
-  value
-) {
-
-  return String(
-    value || ''
-  )
+  return String(value)
 
     .replace(
       /&/g,
@@ -2363,69 +1326,90 @@ function escapeHTML(
       /'/g,
       '&#039;'
     );
-
 }
 
 
-
-/************************************************************
- * 19. 엔터키로 ISBN 검색
- ************************************************************/
-
-
-document
-  .getElementById(
-    'isbn'
-  )
-  .addEventListener(
-    'keydown',
-    event => {
-
-      if (
-        event.key ===
-        'Enter'
-      ) {
-
-        lookupISBN();
-
-      }
-
-    }
-  );
-
-
-
-/************************************************************
- * 20. 페이지 종료 시 카메라 정리
- ************************************************************/
-
-
-window.addEventListener(
-  'beforeunload',
-  () => {
-
-    stopScanner();
-
-  }
-);
-
-
-
-/************************************************************
- * 21. 페이지 시작
- ************************************************************/
-
-
+/**
+ * 페이지 로딩
+ */
 window.addEventListener(
   'load',
-  () => {
+  function() {
 
-    setStatus(
-      'ISBN을 스캔하거나 직접 입력해주세요.'
-    );
+    loadRecent();
 
   }
 );
+function getCameraErrorMessage(error) {
+
+  if (!error) {
+    return '알 수 없는 오류입니다.';
+  }
+
+  const name =
+    error.name || '';
+
+  const message =
+    error.message || '';
+
+
+  switch (name) {
+
+    case 'NotAllowedError':
+
+      return (
+        '카메라 사용이 차단되었습니다. ' +
+        'Chrome의 사이트 권한에서 카메라를 허용해주세요.'
+      );
+
+
+    case 'PermissionDeniedError':
+
+      return (
+        '카메라 권한이 거부되었습니다. ' +
+        'Chrome의 사이트 설정에서 카메라 권한을 허용해주세요.'
+      );
+
+
+    case 'NotFoundError':
+
+      return (
+        '사용 가능한 카메라를 찾지 못했습니다.'
+      );
+
+
+    case 'NotReadableError':
+
+      return (
+        '카메라가 다른 앱에서 사용 중이거나 ' +
+        '카메라에 접근할 수 없습니다.'
+      );
+
+
+    case 'OverconstrainedError':
+
+      return (
+        '후면 카메라를 사용할 수 없습니다. ' +
+        '다른 카메라 설정을 시도해주세요.'
+      );
+
+
+    case 'SecurityError':
+
+      return (
+        '보안 정책 때문에 카메라 사용이 차단되었습니다. ' +
+        'HTTPS로 접속했는지 확인해주세요.'
+      );
+
+
+    default:
+
+      return (
+        name +
+        (message ? ' — ' + message : '')
+      );
+  }
+}
 
 </script>
 
