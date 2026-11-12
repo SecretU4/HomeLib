@@ -984,7 +984,7 @@ function showBook(book) {
   document.getElementById('bookInfo').innerHTML = `
     ${cover}
     <h2 style="margin-top:0">도서정보 확인 및 편집</h2>
-    <div class="book-meta">Google Books 조회 결과입니다. 필요한 항목을 수정한 뒤 저장하세요.</div>
+    <div class="book-meta">도서정보 조회 결과입니다. 필요한 항목을 수정한 뒤 저장하세요.</div>
     <div class="clear"></div>
 
     <label for="editTitle">제목</label>
@@ -1005,10 +1005,13 @@ function showBook(book) {
         <input id="editPublishedDate" value="${escapeHtml(book.publishedDate || '')}" placeholder="예: 2025-01-01">
       </div>
       <div>
-        <label for="editPageCount">페이지 수</label>
-        <input id="editPageCount" type="number" min="0" value="${escapeHtml(book.pageCount || '')}" placeholder="페이지">
+        <label for="editSeries">총서명</label>
+        <input id="editSeries" value="${escapeHtml(book.series || '')}" placeholder="총서명">
       </div>
     </div>
+
+    <label for="editVolume">권차</label>
+    <input id="editVolume" value="${escapeHtml(book.volume || '')}" placeholder="예: 1, 제2권">
 
     <label for="editDescription">책 소개</label>
     <textarea id="editDescription" placeholder="책 소개">${escapeHtml(book.description || '')}</textarea>
@@ -1071,7 +1074,8 @@ function saveBook() {
     authors: document.getElementById('editAuthors').value.trim(),
     publisher: document.getElementById('editPublisher').value.trim(),
     publishedDate: document.getElementById('editPublishedDate').value.trim(),
-    pageCount: document.getElementById('editPageCount').value,
+    series: document.getElementById('editSeries').value.trim(),
+    volume: document.getElementById('editVolume').value.trim(),
     description: document.getElementById('editDescription').value.trim(),
     categories: document.getElementById('editCategories').value.trim(),
     language: document.getElementById('editLanguage').value.trim(),
