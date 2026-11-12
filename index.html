@@ -976,115 +976,56 @@ function lookup(isbn) {
  * 책 정보 표시
  */
 function showBook(book) {
+  const cover = book.thumbnail
+    ? `<img class="cover" src="${escapeHtml(book.thumbnail)}" alt="도서 표지">`
+    : '';
 
-  const cover =
-    book.thumbnail
+  // API에서 가져온 기본 도서정보를 저장 전에 직접 수정할 수 있도록 입력란으로 표시합니다.
+  document.getElementById('bookInfo').innerHTML = `
+    ${cover}
+    <h2 style="margin-top:0">도서정보 확인 및 편집</h2>
+    <div class="book-meta">Google Books 조회 결과입니다. 필요한 항목을 수정한 뒤 저장하세요.</div>
+    <div class="clear"></div>
 
-      ? `
-        <img
-          class="cover"
-          src="${escapeHtml(
-            book.thumbnail
-          )}">
-      `
+    <label for="editTitle">제목</label>
+    <input id="editTitle" value="${escapeHtml(book.title || '')}" placeholder="도서 제목">
 
-      : '';
+    <label for="editSubtitle">부제목</label>
+    <input id="editSubtitle" value="${escapeHtml(book.subtitle || '')}" placeholder="부제목">
 
+    <label for="editAuthors">저자</label>
+    <input id="editAuthors" value="${escapeHtml(book.authors || '')}" placeholder="저자">
 
-  document
-    .getElementById(
-      'bookInfo'
-    )
-    .innerHTML = `
+    <label for="editPublisher">출판사</label>
+    <input id="editPublisher" value="${escapeHtml(book.publisher || '')}" placeholder="출판사">
 
-      ${cover}
-
-      <div
-        class="book-title">
-
-        ${escapeHtml(
-          book.title ||
-          '제목 없음'
-        )}
-
+    <div class="row">
+      <div>
+        <label for="editPublishedDate">출간일</label>
+        <input id="editPublishedDate" value="${escapeHtml(book.publishedDate || '')}" placeholder="예: 2025-01-01">
       </div>
-
-
-      <div
-        class="book-meta">
-
-        ${escapeHtml(
-          book.authors ||
-          '저자 정보 없음'
-        )}
-
+      <div>
+        <label for="editPageCount">페이지 수</label>
+        <input id="editPageCount" type="number" min="0" value="${escapeHtml(book.pageCount || '')}" placeholder="페이지">
       </div>
+    </div>
 
+    <label for="editDescription">책 소개</label>
+    <textarea id="editDescription" placeholder="책 소개">${escapeHtml(book.description || '')}</textarea>
 
-      <div
-        class="book-meta">
+    <label for="editCategories">분류</label>
+    <input id="editCategories" value="${escapeHtml(book.categories || '')}" placeholder="예: 소설, 에세이">
 
-        ${escapeHtml(
-          book.publisher ||
-          ''
-        )}
+    <label for="editLanguage">언어</label>
+    <input id="editLanguage" value="${escapeHtml(book.language || '')}" placeholder="예: ko">
 
-        ${
-          book.publishedDate
-
-            ? ' · ' +
-              escapeHtml(
-                book.publishedDate
-              )
-
-            : ''
-        }
-
-
-        ${
-          book.pageCount
-
-            ? ' · ' +
-              escapeHtml(
-                String(
-                  book.pageCount
-                )
-              ) +
-              '쪽'
-
-            : ''
-        }
-
-      </div>
-
-
-      <div
-        class="book-meta">
-
-        ISBN:
-        ${escapeHtml(
-          book.isbn
-        )}
-
-      </div>
-
-
-      <div
-        class="clear">
-      </div>
-    `;
-
+    <label>ISBN</label>
+    <div class="book-meta">${escapeHtml(book.isbn || '')}</div>
+  `;
 
   document.getElementById('duplicateInfo').innerHTML = '';
-
-  document
-    .getElementById(
-      'bookCard'
-    )
-    .classList
-    .remove('hidden');
+  document.getElementById('bookCard').classList.remove('hidden');
 }
-
 
 /**
  * 중복 확인
@@ -1125,11 +1066,15 @@ function saveBook() {
 
   const book = {
     isbn: currentBook.isbn,
-    title: currentBook.title,
-    authors: currentBook.authors,
-    publisher: currentBook.publisher,
-    publishedDate: currentBook.publishedDate,
-    pageCount: currentBook.pageCount,
+    title: document.getElementById('editTitle').value.trim(),
+    subtitle: document.getElementById('editSubtitle').value.trim(),
+    authors: document.getElementById('editAuthors').value.trim(),
+    publisher: document.getElementById('editPublisher').value.trim(),
+    publishedDate: document.getElementById('editPublishedDate').value.trim(),
+    pageCount: document.getElementById('editPageCount').value,
+    description: document.getElementById('editDescription').value.trim(),
+    categories: document.getElementById('editCategories').value.trim(),
+    language: document.getElementById('editLanguage').value.trim(),
     thumbnail: currentBook.thumbnail,
     source: currentBook.source,
     supplement: document.getElementById('supplement').value,
