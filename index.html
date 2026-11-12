@@ -416,6 +416,15 @@
   </select>
 
 
+  <label>책갈피</label>
+
+  <select id="bookmarkCount">
+    <option value="확인 필요">확인 필요</option>
+    <option value="1개">1개</option>
+    <option value="2개 이상">2개 이상</option>
+    <option value="없음">없음</option>
+  </select>
+
   <label>부록 상세</label>
 
   <input
@@ -464,35 +473,17 @@
   <label>책 상태</label>
 
   <select id="condition">
+    <option value="확인 필요">확인 필요</option>
+    <option value="미개봉">미개봉</option>
+    <option value="개봉">개봉</option>
+  </select>
 
-    <option value="확인 필요">
-      확인 필요
-    </option>
+  <label>표지 보유 여부</label>
 
-    <option value="미개봉">
-      미개봉
-    </option>
-
-    <option value="최상">
-      최상
-    </option>
-
-    <option value="상">
-      상
-    </option>
-
-    <option value="중">
-      중
-    </option>
-
-    <option value="하">
-      하
-    </option>
-
-    <option value="훼손">
-      훼손
-    </option>
-
+  <select id="coverExists">
+    <option value="확인 필요">확인 필요</option>
+    <option value="있음">있음</option>
+    <option value="없음">없음</option>
   </select>
 
 
@@ -1082,10 +1073,12 @@ function saveBook() {
     thumbnail: currentBook.thumbnail,
     source: currentBook.source,
     supplement: document.getElementById('supplement').value,
+    bookmarkCount: document.getElementById('bookmarkCount').value,
     supplementDetail: document.getElementById('supplementDetail').value,
     obi: document.getElementById('obi').value,
     firstEdition: document.getElementById('firstEdition').value,
     condition: document.getElementById('condition').value,
+    coverExists: document.getElementById('coverExists').value,
     location: document.getElementById('location').value,
     purchaseDate: document.getElementById('purchaseDate').value,
     purchasePrice: document.getElementById('purchasePrice').value,
@@ -1136,6 +1129,20 @@ function resetBook() {
     )
     .value =
       '확인 필요';
+
+
+  document
+    .getElementById(
+      'bookmarkCount'
+    )
+    .value = '확인 필요';
+
+
+  document
+    .getElementById(
+      'coverExists'
+    )
+    .value = '확인 필요';
 
 
   document
