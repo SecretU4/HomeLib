@@ -420,6 +420,7 @@
 
   <select id="bookmarkCount">
     <option value="확인 필요">확인 필요</option>
+    <option value="없음">없음</option>
     <option value="1개">1개</option>
     <option value="2개 이상">2개 이상</option>
   </select>
@@ -1224,7 +1225,7 @@ function loadRecent() {
       }
       el.innerHTML = items.map(function(item) {
         return '<div class="recent-item">' +
-          '<div class="recent-title">' + escapeHtml(item.title || '(제목 없음)') + '</div>' +
+          '<div class="recent-title">' + escapeHtml((item.title || '(제목 없음)') + (item.volume ? ' ' + item.volume : '')) + '</div>' +
           '<div class="small">' + escapeHtml(item.author || '') + '</div>' +
           '<div class="small">' + escapeHtml(item.id || '') + ' · ' +
           escapeHtml(item.supplement || '') + ' · ' + escapeHtml(item.condition || '') +
