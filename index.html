@@ -311,6 +311,25 @@
       flex: 1;
     }
 
+    .supplement-details {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid #dadce0;
+      border-radius: 10px;
+      background: #fafbfc;
+    }
+
+    .supplement-details summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 4px 0;
+    }
+
+    .supplement-details[open] summary {
+      margin-bottom: 8px;
+    }
+
   </style>
 
 </head>
@@ -419,40 +438,31 @@
     <option value="기타" selected>기타</option>
   </select>
 
-  <label>부록</label>
-
-  <select id="supplement">
-
-    <option value="확인 필요">
-      확인 필요
-    </option>
-
-    <option value="있음">
-      있음
-    </option>
-
-    <option value="없음">
-      없음
-    </option>
-
-  </select>
-
-
-  <label>책갈피</label>
-
-  <select id="bookmarkCount">
+  <label for="supplement">부록</label>
+  <select id="supplement" onchange="toggleSupplementDetails()">
     <option value="확인 필요">확인 필요</option>
+    <option value="있음">있음</option>
     <option value="없음">없음</option>
-    <option value="1개">1개</option>
-    <option value="2개 이상">2개 이상</option>
   </select>
 
-  <label>부록 상세</label>
+  <div id="supplementExtraGroup" class="hidden">
+    <details class="supplement-details">
+      <summary>부록 상세 및 책갈피 입력 (펼치기)</summary>
 
-  <input
-    id="supplementDetail"
-    placeholder="예: 엽서 3장, CD, 포스터">
+      <label for="supplementDetail">부록 상세</label>
+      <input
+        id="supplementDetail"
+        placeholder="예: 엽서 3장, CD, 포스터">
 
+      <label for="bookmarkCount">책갈피</label>
+      <select id="bookmarkCount">
+        <option value="확인 필요">확인 필요</option>
+        <option value="없음">없음</option>
+        <option value="1개">1개</option>
+        <option value="2개 이상">2개 이상</option>
+      </select>
+    </details>
+  </div>
 
   <label>띠지</label>
 
@@ -508,27 +518,6 @@
     <option value="없음">없음</option>
   </select>
 
-  <label>열람 유무</label>
-  <select id="readingStatus">
-    <option value="확인 필요">확인 필요</option>
-    <option value="있음">있음</option>
-    <option value="없음">없음</option>
-  </select>
-
-  <label>한정&특별</label>
-  <select id="limitedSpecial">
-    <option value="확인 필요">확인 필요</option>
-    <option value="예">예</option>
-    <option value="아니오">아니오</option>
-  </select>
-
-  <label>제본크기</label>
-  <select id="bindingSize">
-    <option value="기타">기타</option>
-    <option value="문고본">문고본</option>
-    <option value="단행본">단행본</option>
-    <option value="화집">화집</option>
-  </select>
 
 
   <label>보관 위치</label>
@@ -670,6 +659,19 @@ function setStatus(
 
     el.classList.add(type);
   }
+}
+
+
+/**
+ * 부록이 있는 경우에만 상세 정보 입력 영역을 표시합니다.
+ * 상세 영역은 details 요소로 접기/펼치기 할 수 있습니다.
+ */
+function toggleSupplementDetails() {
+  const supplement = document.getElementById('supplement');
+  const extraGroup = document.getElementById('supplementExtraGroup');
+  if (!supplement || !extraGroup) return;
+
+  extraGroup.classList.toggle('hidden', supplement.value !== '있음');
 }
 
 
@@ -1118,9 +1120,6 @@ function saveBook() {
     firstEdition: document.getElementById('firstEdition').value,
     condition: document.getElementById('condition').value,
     coverExists: document.getElementById('coverExists').value,
-    readingStatus: document.getElementById('readingStatus').value,
-    limitedSpecial: document.getElementById('limitedSpecial').value,
-    bindingSize: document.getElementById('bindingSize').value,
     location: document.getElementById('location').value,
     purchaseDate: document.getElementById('purchaseDate').value,
     purchasePrice: document.getElementById('purchasePrice').value,
@@ -1176,6 +1175,7 @@ function resetBook() {
     .value =
       '확인 필요';
 
+  toggleSupplementDetails();
 
   document
     .getElementById(
@@ -1189,11 +1189,6 @@ function resetBook() {
       'coverExists'
     )
     .value = '확인 필요';
-
-  document.getElementById('readingStatus').value = '확인 필요';
-  document.getElementById('limitedSpecial').value = '확인 필요';
-  document.getElementById('bindingSize').value = '기타';
-
 
   document
     .getElementById(
