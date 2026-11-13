@@ -555,7 +555,8 @@
     id="manualISBN"
     type="text"
     inputmode="numeric"
-    placeholder="ISBN-10 또는 ISBN-13">
+    placeholder="ISBN-10 또는 ISBN-13"
+    onkeydown="if (event.key === 'Enter') { event.preventDefault(); manualLookup(); }">
 
 
   <button
@@ -853,6 +854,19 @@ function liteRadioMarkup(title, name, options) {
 function liteRadioValue(name) {
   const selected = document.querySelector('input[name="lite_' + name + '"]:checked');
   return selected ? selected.value : '확인 필요';
+}
+
+function updateLiteSupplementGroup() {
+  const supplement = liteRadioValue('supplement');
+  const group = document.getElementById('liteSupplementGroup');
+  if (!group) return;
+  const hasSupplement = supplement === '있음';
+  group.classList.toggle('hidden', !hasSupplement);
+
+  if (supplement === '확인 필요') {
+    const needsCheck = document.querySelector('input[name="lite_bookmarkCount"][value="확인 필요"]');
+    if (needsCheck) needsCheck.checked = true;
+  }
 }
 
 function selectInputMode(mode) {
@@ -1271,13 +1285,11 @@ function showBook(book) {
       liteRadioMarkup('초판','firstEdition',[['확인 필요','확인 필요'],['예','예'],['아니오','아니오']]) +
       liteRadioMarkup('부록','supplement',[['확인 필요','확인 필요'],['있음','있음'],['없음','없음']]) +
     '</div>' +
-    '<div class="lite-radio-group"><div class="lite-radio-title">부록 상세 및 책갈피</div>' +
+    '<div class="lite-radio-group hidden" id="liteSupplementGroup"><div class="lite-radio-title">부록 상세 및 책갈피</div>' +
       '<label for="liteSupplementDetail">부록 상세</label><input id="liteSupplementDetail" placeholder="부록 상세">' +
-      liteRadioMarkup('책갈피','bookmarkCount',[['없음','없음'],['1개','1개'],['2개 이상','2개 이상']]) +
+      liteRadioMarkup('책갈피','bookmarkCount',[['확인 필요','확인 필요'],['없음','없음'],['1개','1개'],['2개 이상','2개 이상']]) +
     '</div>' +
     '<div class="lite-field-grid">' +
-      '<div><label for="litePurchaseDate">구매일</label><input id="litePurchaseDate" type="date"></div>' +
-      '<div><label for="litePurchasePrice">구매 가격</label><input id="litePurchasePrice" type="number" inputmode="numeric" placeholder="원"></div>' +
       '<div class="full"><label for="liteNote">메모</label><textarea id="liteNote" placeholder="특이사항"></textarea></div>' +
     '</div>' +
     '<div class="lite-save-bar">' +
@@ -1287,6 +1299,11 @@ function showBook(book) {
 
   document.getElementById('liteTitle').value = book.title || '';
   document.getElementById('liteSeries').value = book.series || '';
+
+  document.querySelectorAll('input[name="lite_supplement"]').forEach(function(input) {
+    input.addEventListener('change', updateLiteSupplementGroup);
+  });
+  updateLiteSupplementGroup();
 
   document.getElementById('bookCard').classList.remove('hidden');
   selectInputMode(currentInputMode);
@@ -1354,8 +1371,8 @@ function saveBook(saveAndScan = false) {
     condition: lite ? liteRadioValue('condition') : document.getElementById('condition').value,
     coverExists: lite ? liteRadioValue('coverExists') : document.getElementById('coverExists').value,
     location: lite ? document.getElementById('liteLocation').value : document.getElementById('location').value,
-    purchaseDate: lite ? document.getElementById('litePurchaseDate').value : document.getElementById('purchaseDate').value,
-    purchasePrice: lite ? document.getElementById('litePurchasePrice').value : document.getElementById('purchasePrice').value,
+    purchaseDate: lite ? '' : document.getElementById('purchaseDate').value,
+    purchasePrice: lite ? '' : document.getElementById('purchasePrice').value,
     note: lite ? document.getElementById('liteNote').value : document.getElementById('note').value
   };
 
