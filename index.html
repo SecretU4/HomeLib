@@ -833,12 +833,34 @@ function setStatus(
  * 부록이 있는 경우에만 상세 정보 입력 영역을 표시합니다.
  * 상세 영역은 details 요소로 접기/펼치기 할 수 있습니다.
  */
+function syncBookmarkWithSupplement(supplementValue, bookmarkSelect, bookmarkRadios) {
+  if (supplementValue !== '확인 필요' && supplementValue !== '없음') return;
+
+  const requiredBookmark = supplementValue === '확인 필요' ? '확인 필요' : '없음';
+
+  if (bookmarkSelect) {
+    bookmarkSelect.value = requiredBookmark;
+  }
+
+  if (bookmarkRadios) {
+    const target = document.querySelector(
+      'input[name="lite_bookmarkCount"][value="' + requiredBookmark + '"]'
+    );
+    if (target) target.checked = true;
+  }
+}
+
 function toggleSupplementDetails() {
   const supplement = document.getElementById('supplement');
   const extraGroup = document.getElementById('supplementExtraGroup');
   if (!supplement || !extraGroup) return;
 
   extraGroup.classList.toggle('hidden', supplement.value !== '있음');
+  syncBookmarkWithSupplement(
+    supplement.value,
+    document.getElementById('bookmarkCount'),
+    false
+  );
 }
 
 
@@ -863,10 +885,7 @@ function updateLiteSupplementGroup() {
   const hasSupplement = supplement === '있음';
   group.classList.toggle('hidden', !hasSupplement);
 
-  if (supplement === '확인 필요') {
-    const needsCheck = document.querySelector('input[name="lite_bookmarkCount"][value="확인 필요"]');
-    if (needsCheck) needsCheck.checked = true;
-  }
+  syncBookmarkWithSupplement(supplement, null, true);
 }
 
 function selectInputMode(mode) {
