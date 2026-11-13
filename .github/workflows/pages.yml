@@ -1,0 +1,64 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Inject GAS URL from secret
+        env:
+          GAS_URL: ${{ secrets.GAS_URL }}
+        run: |
+          if [ -z "$GAS_URL" ]; then
+            echo "GitHub Actions secret GAS_URL is empty or missing."
+            exit 1
+          fi
+          mkdir -p _site
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          html = Path("index.html").read_text(encoding="utf-8")
+          marker = "__GAS_URL__"
+          if marker not in html:
+              raise SystemExit("GAS URL placeholder not found in index.html")
+          Path("_site/index.html").write_text(
+              html.replace(marker, os.environ["GAS_URL"]),
+              encoding="utf-8"
+          )
+          PY
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
