@@ -363,6 +363,126 @@
       .quick-save-bar button { font-size: 12px; }
     }
 
+
+    .scan-mode-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .scan-mode-buttons button {
+      min-height: 58px;
+      margin-top: 10px;
+      padding: 8px;
+      font-size: 15px;
+    }
+    .scan-mode-buttons button span {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      font-weight: 400;
+      opacity: .9;
+    }
+    .scan-mode-buttons button.active {
+      outline: 3px solid #a8c7fa;
+      outline-offset: 1px;
+    }
+    .lite-book-card {
+      margin-top: 14px;
+    }
+    .lite-book-head {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 112px;
+      gap: 12px;
+      align-items: start;
+    }
+    .lite-book-head .cover {
+      float: none;
+      width: 100%;
+      max-height: 155px;
+      margin: 0;
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+    .lite-isbn {
+      grid-column: 2;
+      text-align: center;
+      overflow-wrap: anywhere;
+      font-size: 11px;
+      color: #666;
+    }
+    .lite-field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+    }
+    .lite-field-grid .full {
+      grid-column: 1 / -1;
+    }
+    .lite-radio-group {
+      margin-top: 14px;
+      padding: 10px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+    }
+    .lite-radio-title {
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .lite-radio-options {
+      display: flex;
+      justify-content: space-around;
+      gap: 4px;
+    }
+    .lite-radio-options label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      margin: 0;
+      font-size: 12px;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+    .lite-radio-options input {
+      appearance: none;
+      width: 23px;
+      height: 23px;
+      min-height: 23px;
+      padding: 0;
+      border: 3px solid #222;
+      border-radius: 50%;
+      position: relative;
+    }
+    .lite-radio-options input:checked::after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: #d93025;
+    }
+    .lite-radio-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .lite-save-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .lite-save-bar button {
+      margin: 0;
+      font-size: 13px;
+      padding: 8px 4px;
+    }
+    @media (max-width: 380px) {
+      .lite-book-head { grid-template-columns: minmax(0,1fr) 92px; }
+      .lite-radio-options label { font-size: 11px; }
+      .lite-radio-options input { width: 21px; height: 21px; min-height: 21px; }
+    }
+
   </style>
 
 </head>
@@ -390,13 +510,16 @@
   <div id="reader"></div>
 
 
-  <button
-    id="startButton"
-    onclick="startScanner()">
-
-    📷 ISBN 스캔 시작
-
-  </button>
+  <div class="scan-mode-buttons" role="group" aria-label="입력 방식 선택">
+    <button id="startButton" type="button" onclick="selectInputMode('pro'); startScanner()">
+      📷 PRO 방식
+      <span>전체 항목 입력</span>
+    </button>
+    <button id="liteStartButton" class="secondary" type="button" onclick="selectInputMode('lite'); startScanner()">
+      ⚡ LITE 방식
+      <span>간략 입력</span>
+    </button>
+  </div>
 
 
   <button
@@ -440,10 +563,12 @@
   class="card hidden">
 
 
-  <div id="bookInfo"></div>
-
-
   <div id="duplicateInfo"></div>
+
+  <div id="proBookInfo"></div>
+  <div id="liteBookInfo" class="hidden"></div>
+
+  <div id="proFields">
 
 
   <h2>소장 정보</h2>
@@ -591,7 +716,9 @@
       저장 후 바코드 스캔
     </button>
   </div>
+  </div>
 
+  <div id="liteFields" class="hidden"></div>
 
 </div>
 
@@ -656,6 +783,8 @@ let currentBook = null;
 
 let isSavingBook = false;
 
+let currentInputMode = 'pro';
+
 let scanning = false;
 
 let lastScan = '';
@@ -701,6 +830,31 @@ function toggleSupplementDetails() {
   extraGroup.classList.toggle('hidden', supplement.value !== '있음');
 }
 
+
+
+function liteRadioMarkup(title, name, options) {
+  return '<div class="lite-radio-group"><div class="lite-radio-title">' + title + '</div><div class="lite-radio-options">' +
+    options.map(function(option, index) {
+      return '<label><input type="radio" name="lite_' + name + '" value="' + escapeHtml(option[0]) + '"' +
+        (index === 0 ? ' checked' : '') + '><span>' + option[1] + '</span></label>';
+    }).join('') + '</div></div>';
+}
+
+function liteRadioValue(name) {
+  const selected = document.querySelector('input[name="lite_' + name + '"]:checked');
+  return selected ? selected.value : '확인 필요';
+}
+
+function selectInputMode(mode) {
+  currentInputMode = mode === 'lite' ? 'lite' : 'pro';
+  const pro = currentInputMode === 'pro';
+  document.getElementById('proBookInfo').classList.toggle('hidden', !pro);
+  document.getElementById('proFields').classList.toggle('hidden', !pro);
+  document.getElementById('liteBookInfo').classList.toggle('hidden', pro);
+  document.getElementById('liteFields').classList.add('hidden');
+  document.getElementById('startButton').classList.toggle('active', pro);
+  document.getElementById('liteStartButton').classList.toggle('active', !pro);
+}
 
 /**
  * 스캐너 시작
@@ -1027,6 +1181,8 @@ function lookup(isbn) {
       currentBook = book;
       showBook(book);
       checkDuplicate(book.isbn);
+      document.getElementById('proFields').classList.toggle('hidden', currentInputMode !== 'pro');
+      document.getElementById('liteBookInfo').classList.toggle('hidden', currentInputMode !== 'lite');
       setStatus('도서정보를 찾았습니다. 소장 정보를 입력해주세요.', 'success');
     })
     .catch(function(error) {
@@ -1045,7 +1201,7 @@ function showBook(book) {
     : '';
 
   // API에서 가져온 기본 도서정보를 저장 전에 직접 수정할 수 있도록 입력란으로 표시합니다.
-  document.getElementById('bookInfo').innerHTML = `
+  document.getElementById('proBookInfo').innerHTML = `
     ${cover}
     <h2 style="margin-top:0">도서정보 확인 및 편집</h2>
     <div class="book-meta">도서정보 조회 결과입니다. 필요한 항목을 수정한 뒤 저장하세요.</div>
@@ -1085,7 +1241,61 @@ function showBook(book) {
   `;
 
   document.getElementById('duplicateInfo').innerHTML = '';
+
+  const liteCover = book.thumbnail
+    ? '<img class="cover" src="' + escapeHtml(book.thumbnail) + '" alt="도서 표지">'
+    : '<div class="cover" aria-label="표지 이미지 없음"></div>';
+  document.getElementById('liteBookInfo').innerHTML =
+    '<div class="lite-book-head">' +
+      '<div><div class="small">제목</div><div class="book-title" id="liteTitlePreview"></div>' +
+      '<div class="small" style="margin-top:12px">시리즈명</div><div class="book-title" id="liteSeriesPreview"></div>' +
+      '<div class="small" style="margin-top:12px">보관 위치</div><div class="book-title" id="liteLocationPreview"></div></div>' +
+      liteCover +
+      '<div class="lite-isbn">ISBN: ' + escapeHtml(book.isbn || '') + '</div>' +
+    '</div>' +
+    '<div class="lite-field-grid">' +
+      '<div><label for="liteTitle">제목</label><input id="liteTitle" placeholder="책 제목"></div>' +
+      '<div><label for="liteVolume">권차</label><input id="liteVolume" placeholder="권차"></div>' +
+      '<div><label for="liteSeries">시리즈명</label><input id="liteSeries" placeholder="총서명"></div>' +
+      '<div><label for="liteLocation">보관 위치</label><input id="liteLocation" placeholder="보관 위치"></div>' +
+      '<div class="full"><label for="liteBindingSize">제본 크기</label><select id="liteBindingSize"><option value="문고본">문고본</option><option value="단행본">단행본</option><option value="화집">화집</option><option value="노벨">노벨</option><option value="기타" selected>기타</option></select></div>' +
+    '</div>' +
+    '<div class="lite-radio-columns">' +
+      liteRadioMarkup('열람 유무','readingStatus',[['확인 필요','확인필요'],['있음','있음'],['없음','없음']]) +
+      liteRadioMarkup('책 상태','condition',[['확인 필요','확인필요'],['개봉','개봉'],['미개봉','미개봉']]) +
+      liteRadioMarkup('표지 보유 여부','coverExists',[['확인 필요','확인필요'],['있음','있음'],['없음','없음']]) +
+      liteRadioMarkup('띠지','obi',[['확인 필요','확인필요'],['있음','있음'],['없음','없음']]) +
+      liteRadioMarkup('초판','firstEdition',[['확인 필요','확인필요'],['예','예'],['아니오','아니오']]) +
+      liteRadioMarkup('부록','supplement',[['확인 필요','확인필요'],['있음','예'],['없음','아니오']]) +
+    '</div>' +
+    '<div class="lite-radio-group"><div class="lite-radio-title">부록 상세 및 책갈피</div>' +
+      '<label for="liteSupplementDetail">상세</label><input id="liteSupplementDetail" placeholder="부록 상세">' +
+      liteRadioMarkup('책갈피','bookmarkCount',[['없음','없음'],['1개','1개'],['2개 이상','2개 이상']]) +
+    '</div>' +
+    '<div class="lite-field-grid">' +
+      '<div><label for="litePurchaseDate">구매일</label><input id="litePurchaseDate" type="date"></div>' +
+      '<div><label for="litePurchasePrice">구매 가격</label><input id="litePurchasePrice" type="number" inputmode="numeric" placeholder="원"></div>' +
+      '<div class="full"><label for="liteNote">메모</label><textarea id="liteNote" placeholder="특이사항"></textarea></div>' +
+    '</div>' +
+    '<div class="lite-save-bar">' +
+      '<button class="success" type="button" onclick="saveBook(false)">💾 저장</button>' +
+      '<button class="secondary" type="button" onclick="saveBook(true)">저장 및 바코드 스캔</button>' +
+    '</div>';
+
+  ['liteTitle','liteSeries','liteLocation'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', function() {
+      const previewId = id + 'Preview';
+      document.getElementById(previewId).textContent = this.value || ' ';
+    });
+  });
+  document.getElementById('liteTitle').value = book.title || '';
+  document.getElementById('liteSeries').value = book.series || '';
+  ['liteTitle','liteSeries','liteLocation'].forEach(function(id) {
+    document.getElementById(id).dispatchEvent(new Event('input'));
+  });
+
   document.getElementById('bookCard').classList.remove('hidden');
+  selectInputMode(currentInputMode);
 }
 
 /**
@@ -1126,32 +1336,33 @@ function saveBook(saveAndScan = false) {
   }
   if (isSavingBook) return;
 
+  const lite = currentInputMode === 'lite';
   const book = {
     isbn: currentBook.isbn,
-    title: document.getElementById('editTitle').value.trim(),
-    subtitle: document.getElementById('editSubtitle').value.trim(),
-    authors: document.getElementById('editAuthors').value.trim(),
-    publisher: document.getElementById('editPublisher').value.trim(),
-    publishedDate: document.getElementById('editPublishedDate').value.trim(),
-    series: document.getElementById('editSeries').value.trim(),
-    volume: document.getElementById('editVolume').value.trim(),
-    categories: document.getElementById('editCategories').value.trim(),
+    title: (lite ? document.getElementById('liteTitle').value : document.getElementById('editTitle').value).trim(),
+    subtitle: lite ? '' : document.getElementById('editSubtitle').value.trim(),
+    authors: lite ? (currentBook.authors || '') : document.getElementById('editAuthors').value.trim(),
+    publisher: lite ? (currentBook.publisher || '') : document.getElementById('editPublisher').value.trim(),
+    publishedDate: lite ? (currentBook.publishedDate || '') : document.getElementById('editPublishedDate').value.trim(),
+    series: (lite ? document.getElementById('liteSeries').value : document.getElementById('editSeries').value).trim(),
+    volume: (lite ? document.getElementById('liteVolume').value : document.getElementById('editVolume').value).trim(),
+    categories: lite ? (currentBook.categories || '') : document.getElementById('editCategories').value.trim(),
     thumbnail: currentBook.thumbnail,
     source: currentBook.source,
-    readingStatus: document.getElementById('readingStatus').value,
-    limitedSpecial: document.getElementById('limitedSpecial').value,
-    bindingSize: document.getElementById('bindingSize').value,
-    supplement: document.getElementById('supplement').value,
-    bookmarkCount: document.getElementById('bookmarkCount').value,
-    supplementDetail: document.getElementById('supplementDetail').value,
-    obi: document.getElementById('obi').value,
-    firstEdition: document.getElementById('firstEdition').value,
-    condition: document.getElementById('condition').value,
-    coverExists: document.getElementById('coverExists').value,
-    location: document.getElementById('location').value,
-    purchaseDate: document.getElementById('purchaseDate').value,
-    purchasePrice: document.getElementById('purchasePrice').value,
-    note: document.getElementById('note').value
+    readingStatus: lite ? liteRadioValue('readingStatus') : document.getElementById('readingStatus').value,
+    limitedSpecial: lite ? '확인 필요' : document.getElementById('limitedSpecial').value,
+    bindingSize: lite ? document.getElementById('liteBindingSize').value : document.getElementById('bindingSize').value,
+    supplement: lite ? (liteRadioValue('supplement') === '있음' ? '있음' : liteRadioValue('supplement') === '없음' ? '없음' : '확인 필요') : document.getElementById('supplement').value,
+    bookmarkCount: lite ? liteRadioValue('bookmarkCount') : document.getElementById('bookmarkCount').value,
+    supplementDetail: lite ? document.getElementById('liteSupplementDetail').value : document.getElementById('supplementDetail').value,
+    obi: lite ? liteRadioValue('obi') : document.getElementById('obi').value,
+    firstEdition: lite ? liteRadioValue('firstEdition') : document.getElementById('firstEdition').value,
+    condition: lite ? liteRadioValue('condition') : document.getElementById('condition').value,
+    coverExists: lite ? liteRadioValue('coverExists') : document.getElementById('coverExists').value,
+    location: lite ? document.getElementById('liteLocation').value : document.getElementById('location').value,
+    purchaseDate: lite ? document.getElementById('litePurchaseDate').value : document.getElementById('purchaseDate').value,
+    purchasePrice: lite ? document.getElementById('litePurchasePrice').value : document.getElementById('purchasePrice').value,
+    note: lite ? document.getElementById('liteNote').value : document.getElementById('note').value
   };
 
   isSavingBook = true;
