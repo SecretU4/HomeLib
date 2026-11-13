@@ -957,10 +957,8 @@ function startScanner() {
 
         scanning = true;
 
-        document
-          .getElementById('startButton')
-          .classList
-          .add('hidden');
+        document.getElementById('startButton').classList.add('hidden');
+        document.getElementById('liteStartButton').classList.add('hidden');
 
         document
           .getElementById('stopButton')
@@ -1113,12 +1111,8 @@ function stopScanner() {
       scanning = false;
 
 
-      document
-        .getElementById(
-          'startButton'
-        )
-        .classList
-        .remove('hidden');
+      document.getElementById('startButton').classList.remove('hidden');
+      document.getElementById('liteStartButton').classList.remove('hidden');
 
 
       document
